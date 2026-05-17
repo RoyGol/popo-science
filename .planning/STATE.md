@@ -14,7 +14,7 @@ See: `.planning/PROJECT.md` (updated 2026-05-17)
 |-------|--------|---------|-----------|
 | Phase 0 — MVP Study App | ✓ Complete | 2026-05-17 | 2026-05-17 |
 | Phase 1 — Deploy to URL | ✓ Complete | 2026-05-17 | 2026-05-17 |
-| Phase 2 — Reusability Refactor | ○ Pending (post-test) | — | — |
+| Phase 2 — Reusability Refactor | ○ Planned (exec deferred to post-test) | — | — |
 
 ## Active Work
 
@@ -30,6 +30,7 @@ None right now — both shipped phases ahead of the deadline. The next meaningfu
 - 2026-05-17 — Git repo initialized in `popo-science/` (commit `ccf7b4e`).
 - 2026-05-17 — Pushed code to GitHub: https://github.com/RoyGol/popo-science (code backup; not used for deploy).
 - 2026-05-17 — Phase 1 shipped: deployed to Hostinger at https://palevioletred-crow-274361.hostingersite.com/.
+- 2026-05-17 — Phase 2 planned (3 plans: extract-content, subject-picker, readme). Execution deferred to post-test.
 
 ## Notes for Future Claude Sessions
 
