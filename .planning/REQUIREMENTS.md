@@ -31,12 +31,16 @@ Requirements for the initial test (2026-05-26) plus the reusability work. v1 her
 - [x] **DEPLOY-03**: URL is bookmarkable (auto-generated Hostinger subdomain; long but bookmark-once-and-done is fine for the use case)
 - [x] **DEPLOY-04**: Deployment process is one-step via Hostinger
 
-### Reusability (Phase 2)
+### Study Modes (Phase 2 — shipped ✓)
 
-- [ ] **REUSE-01**: Chapter content (theory blocks, videos, questions, diagrams) lives in a separate data file, not inline inside `index.html`
-- [ ] **REUSE-02**: Adding a new subject = drop in a new data file, no JS/HTML changes required to the app shell
-- [ ] **REUSE-03**: A second sample subject exists in the codebase as proof-of-concept
-- [ ] **REUSE-04**: Short README documents the data schema and how to add a new subject
+- [x] **STUDY-01**: "מבחן סופי" mode — randomized 20-question mixed exam from across all chapters with score and best-score tracking
+- [x] **STUDY-02**: "שאלות לחזרה" mode — pool of all wrong-on-first-try questions; re-answering correctly removes from pool and updates chapter progress
+- [x] **STUDY-03**: Home screen shows mastery (correct/answered) per chapter; overall progress shows % correct
+- [x] **STUDY-04**: Best final-exam score persisted across sessions and shown on the exam card
+
+### Reusability (re-classified — moved from Phase 2 to v2)
+
+The original REUSE-01..04 requirements were re-scoped out of v1 on 2026-05-17. They may return as v2 if more subjects become a real need after the May 26 test.
 
 ## v2 Requirements
 
@@ -44,10 +48,19 @@ Deferred. Not in current roadmap.
 
 ### Content & Quiz
 
-- **CONT-V2-01**: Mixed "final exam" mode that draws questions from all chapters
-- **CONT-V2-02**: Spaced-repetition / focus-on-wrong-answers review mode
+- ~~**CONT-V2-01**: Mixed "final exam" mode~~ → shipped as STUDY-01 in Phase 2
+- ~~**CONT-V2-02**: Spaced-repetition / focus-on-wrong-answers review mode~~ → shipped as STUDY-02 in Phase 2
 - **CONT-V2-03**: Real labeled anatomy diagrams (extracted or licensed) instead of simplified SVGs — only if she struggles with the current visuals
 - **CONT-V2-04**: Audio narration of theory blocks (helpful for kids who prefer listening)
+- **CONT-V2-05**: Flashcard mode for memorizing Hebrew terminology (bone names, layer names, joint types)
+- **CONT-V2-06**: Printable one-page summary for last-day review
+
+### Reusability (moved from former Phase 2)
+
+- **REUSE-V2-01**: Chapter content extracted into separate data files
+- **REUSE-V2-02**: Multi-subject support with subject picker
+- **REUSE-V2-03**: A second sample subject (if/when other tests come up)
+- **REUSE-V2-04**: README documenting how to add a subject
 
 ### Authoring
 
@@ -71,13 +84,13 @@ Deferred. Not in current roadmap.
 | CONT-01 → CONT-06 | Phase 0 | Complete ✓ |
 | UX-01 → UX-05 | Phase 0 | Complete ✓ |
 | DEPLOY-01 → DEPLOY-04 | Phase 1 | Complete ✓ |
-| REUSE-01 → REUSE-04 | Phase 2 | Pending |
+| STUDY-01 → STUDY-04 | Phase 2 | Complete ✓ |
 
 **Coverage:**
-- v1 requirements: 19 total (15 done, 4 pending)
+- v1 requirements: 19 total — all 19 complete ✓
 - Mapped to phases: 19
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-17*
-*Last updated: 2026-05-17 after Phase 1 deployment*
+*Last updated: 2026-05-17 after Phase 2 (study mode improvements) shipped*

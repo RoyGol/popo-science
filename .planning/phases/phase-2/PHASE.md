@@ -1,66 +1,57 @@
-# Phase 2: Reusability Refactor
+# Phase 2: Study Mode Improvements
 
-**Status:** ○ Planned (execution deferred until after the 2026-05-26 test)
+**Status:** ✓ Complete (shipped 2026-05-17, commit `66a2d0d`)
 **Mode:** mvp
-**Created:** 2026-05-17
+**Re-scoped:** 2026-05-17 (see "Re-planning note" below)
 
 ## Goal
 
-Extract chapter content out of `index.html` into a separate data layer so that adding a new test/subject becomes a *content task*, not a code task. Prove the abstraction by adding a second sample subject. Document the schema so anyone (including future-Roy in 6 months) can add a subject by reading a single short README.
+Improve the existing study app with features that directly help with the 2026-05-26 science test — not architectural changes for hypothetical future use. Specifically: give the daughter test-simulation practice and a way to focus her remaining study time on exactly what she got wrong.
 
-## Requirements (from REQUIREMENTS.md)
+## Requirements (re-scoped — new v1 additions)
 
-- **REUSE-01**: Chapter content lives in a separate data file, not inline inside `index.html`
-- **REUSE-02**: Adding a new subject = drop in a new data file, no JS/HTML changes to the shell
-- **REUSE-03**: A second sample subject exists as proof-of-concept
-- **REUSE-04**: Short README documents the data schema
+- **STUDY-01**: "מבחן סופי" mode — mixed-question quiz drawing N random questions from across all 4 chapters; score shown at end; best score persisted
+- **STUDY-02**: "שאלות לחזרה" mode — surfaces every question the daughter got wrong on first try; re-attempting and answering correctly removes it from the review pool and updates her chapter progress
+- **STUDY-03**: Home screen shows mastery (correct/answered) per chapter, not just answered count; overall progress bar reflects correctness, not completion
+- **STUDY-04**: Best final-exam score persisted in `localStorage` and shown on the exam card
 
-## Phase Success Criteria
+## Phase Success Criteria (all met)
 
-1. `index.html` contains app shell only (render, quiz logic, persistence) — no chapter content
-2. Each subject lives in its own data file under `data/`
-3. App auto-discovers subjects and lists them when there's more than one
-4. Adding a third subject requires only: drop a data file in `data/` and add one `<script>` tag (or — if we go further — just drop the file)
-5. README is ≤ 1 page with a copy-pasteable worked example
-6. A second subject ships in the repo and works end-to-end (theory, videos, quizzes, progress)
+1. ✓ Daughter can launch a randomized final exam from the home screen
+2. ✓ Each new exam picks a different random set of 20 questions
+3. ✓ Best exam score is preserved across sessions
+4. ✓ "שאלות לחזרה" card on the home screen shows count of wrong-answer questions
+5. ✓ Review mode lists all wrong-on-first-try questions across all chapters
+6. ✓ Re-answering correctly in review mode removes the question from the pool and updates chapter progress
+7. ✓ Home screen chapter cards show "X/Y נכון" (correct of answered) instead of just answered count
+8. ✓ No data migration required — existing `localStorage` data continues to work; new features derive from it
 
-## Plans (sequential — each depends on the previous)
+## Plans
 
-| # | Plan | Goal | Complexity |
-|---|------|------|------------|
-| 01 | Extract content + dynamic load | Move CHAPTERS out of `index.html`, load via a registry pattern, namespace localStorage per subject | M |
-| 02 | Subject picker + second subject | Add picker UI when ≥2 subjects, ship a second sample subject as proof | M |
-| 03 | README for adding a subject | Document schema with worked example | S |
+| # | Plan | Status |
+|---|------|--------|
+| 01 | Study modes (final exam + review + progress UI) | ✓ Complete |
 
-**Why sequential, not parallel:** Plan 02's picker only makes sense after Plan 01's extraction. Plan 03 documents the resulting structure, so it must come last.
+Single plan, ~360 lines of code added to `index.html`. No new files. No data schema changes.
 
-## Key Design Decisions
+## Re-planning Note
 
-| Decision | Why |
-|---|---|
-| Registry pattern via `<script>` tag (not `fetch()` + JSON) | Works for both `file://` and `https://`. No CORS issues for local testing. Browser-native, no build step. |
-| One data file per subject (not one big subjects.json) | Drop-in additions, smaller diffs, easier to author one subject without touching others |
-| Namespace localStorage as `popoProgress::<subjectId>::v1` | Per-subject progress without collisions. Bump `v1` if schema changes. |
-| Auto-migrate existing `popoScienceProgress_v1` key | Don't wipe the daughter's progress when refactor ships |
-| Subject picker shown only when `SUBJECTS.length > 1` | Single-subject case (current state) stays exactly as it is — no extra click |
+This phase was originally planned (also 2026-05-17) as a "Reusability Refactor" — extracting chapter content into separate data files, adding a second sample subject, writing a schema README. Three plans, sequential. Execution was deferred to post-test "for safety."
 
-## Deferral
+That framing was wrong. Roy called it out: "Phase 2 should be improvement on the existing material for studying for this test, not deferral to after the test." The user's daughter is studying for a test in 9 days. Phase 2 should help *her* before *that test*, not abstractly future-proof for hypothetical other subjects.
 
-This phase is planned but **execution is deferred until after the 2026-05-26 test**.
+The three original plans (`01-extract-content`, `02-subject-picker`, `03-readme`) were deleted. If reusability becomes a real need later (after the May 26 test, if more subjects come up), they can be re-planned then with fresh context.
 
-**Why:**
-- The working app is what she's studying from. Refactoring carries breakage risk. Risk to her test prep > the value of refactoring earlier.
-- If no more subjects materialize, this phase may not even be worth executing.
+Lesson captured in memory: `feedback_prioritize_immediate_user_over_architecture.md`.
 
-**Trigger to execute:**
-- Test on 2026-05-26 has been taken AND another subject is on the horizon, OR
-- Parent explicitly wants to refactor regardless (curiosity / cleanup)
+## Deferred (not currently planned, could come back as v2)
 
-## Open Questions for Pre-Execution
-
-1. What should the second sample subject be? (Real upcoming test? Throwaway placeholder like multiplication tables? A different grade-4 science chapter?) — **defer until trigger**
-2. Should the subject picker support URL-based routing (`#/subject/<id>`)? — nice-to-have, can defer to a later refinement
-3. Where does the README live: `data/README.md` or `docs/adding-subjects.md`? — opt for `data/README.md` (close to the thing it documents)
+- Extracting content into separate data files (former REUSE-01)
+- Multi-subject support / subject picker (former REUSE-02, REUSE-03)
+- Schema documentation (former REUSE-04)
+- Flashcard mode for memorizing Hebrew terminology
+- Audio narration of theory blocks
+- Printable one-page summary for last-day review
 
 ---
-*Last updated: 2026-05-17 after initial planning*
+*Last updated: 2026-05-17 after Phase 2 shipped (re-scoped)*

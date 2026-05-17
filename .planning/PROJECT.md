@@ -21,14 +21,15 @@ The student can study independently — read, watch, and practice — and walk i
 - ✓ Hebrew RTL layout with kid-friendly font (Heebo), gradients, and progress indicators — Phase 0
 - ✓ Per-chapter and overall progress persisted in `localStorage` — Phase 0
 - ✓ Deployed to a public URL — Phase 1 (2026-05-17, `https://palevioletred-crow-274361.hostingersite.com/`, hosted on Hostinger)
+- ✓ "מבחן סופי" mode — randomized mixed-question exam from all chapters with best-score tracking — Phase 2
+- ✓ "שאלות לחזרה" mode — review pool of every question answered incorrectly, with re-attempt that updates chapter progress — Phase 2
+- ✓ Mastery progress UI — home cards show correct-of-answered and overall progress shows mastery % — Phase 2
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-- [ ] Chapter content (theory, videos, questions) extracted from `index.html` into a separate data structure (JSON or JS module) so that adding a new subject doesn't require editing the app code
-- [ ] One additional sample subject added as proof-of-concept for the reusability refactor
-- [ ] Short README on how to add a new test/subject (file layout, fields, gotchas)
+(None — Phase 0, 1, 2 all shipped. Next moves are reactive: respond to her real-world use of the app over the next 9 days before the test, fix any content errors she surfaces, and revisit roadmap after the test.)
 
 ### Out of Scope
 
@@ -65,8 +66,9 @@ The student can study independently — read, watch, and practice — and walk i
 | Simplified SVG diagrams instead of extracting PDF images | PDF image extraction is fragile; SVG renders crisp on any screen; concepts > photorealism for memorization | — Pending (validate after she uses it) |
 | Embed YouTube videos directly (iframe) rather than re-hosting | Free, reliable, already curated by her teacher | ✓ Good |
 | `localStorage` for progress, no backend | Single-user app, no need for sync; eliminates an entire class of ops | ✓ Good |
-| Defer reusability refactor to Phase 2 (after deployment) | Test on 2026-05-26 is the priority; refactor doesn't help her study | — Pending |
+| Re-scope Phase 2 from "reusability refactor" to "study mode improvements" | Original framing aimed at hypothetical future subjects; user called out that work should help the daughter pass *this* test in 9 days | ✓ Good (Phase 2 shipped same day as a focused study-aid release) |
 | Host on Hostinger instead of GitHub Pages / Netlify | Parent already has Hostinger; reuses existing infra and credentials | ✓ Good (Phase 1 shipped same day) |
+| Review mode derives wrong-answer set from existing `localStorage` (no schema change) | Avoids data migration risk during active use; backward compatible | ✓ Good |
 
 ## Evolution
 
@@ -86,4 +88,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state (did she pass the test? what did she actually use?)
 
 ---
-*Last updated: 2026-05-17 after Phase 1 deployment*
+*Last updated: 2026-05-17 after Phase 2 (study mode improvements) shipped*

@@ -10,7 +10,7 @@
 |---|-------|------|--------------|--------|
 | 0 | MVP Study App | Daughter can study from this PC | CONT-01..06, UX-01..05 | Complete ✓ |
 | 1 | Deploy to a URL | Daughter can study from phone/tablet | DEPLOY-01..04 | Complete ✓ |
-| 2 | Reusability refactor | Adding a new subject takes < 1 hour | REUSE-01..04 | Pending ○ |
+| 2 | Study mode improvements | Mixed final exam, wrong-answer review, mastery UI | STUDY-01..04 | Complete ✓ |
 
 ---
 
@@ -70,34 +70,30 @@
 
 ---
 
-## Phase 2: Reusability Refactor
+## Phase 2: Study Mode Improvements
 
-**Goal:** Extract chapter content out of the inline `CHAPTERS` array in `index.html` into a standalone data file (or files), and demonstrate the abstraction by adding a second subject. After this phase, adding a new test/subject is a content task, not a code task.
+**Goal:** Help the daughter prepare for the 2026-05-26 test with test-simulation practice and focused review on her actual weak spots — without architectural changes.
 **Mode:** mvp
-**Status:** Pending ○
-**Trigger to start:** After Phase 1 ships AND after the 2026-05-26 test (no point doing this before — the test is the priority).
+**Status:** Complete ✓ (shipped 2026-05-17, commit `66a2d0d`)
+
+**Re-scoping note:** Phase 2 was originally planned as a "reusability refactor" (extracting content, multi-subject support, README). That plan was deleted and replaced on 2026-05-17 after Roy clarified the priority should be "improvement on the existing material for studying for this test." The reusability work moved to v2 in REQUIREMENTS.md. Details in `.planning/phases/phase-2/PHASE.md` and in memory `feedback_prioritize_immediate_user_over_architecture.md`.
 
 **Requirements covered:**
-- REUSE-01: Content in a separate data file
-- REUSE-02: Drop-in subject mechanism
-- REUSE-03: Sample second subject as proof
-- REUSE-04: README documenting the schema
+- STUDY-01: "מבחן סופי" mixed-question mode
+- STUDY-02: "שאלות לחזרה" wrong-answer review mode
+- STUDY-03: Mastery progress UI (correct/answered per chapter)
+- STUDY-04: Best exam score tracking
 
-**Success criteria:**
-1. `index.html` contains the app shell (rendering, quiz logic, persistence) but no chapter content
-2. Each subject lives in its own data file (e.g. `data/science-grade4-bodies.json` and one more)
-3. App auto-discovers / lists available subjects (or has a simple subject selector)
-4. Adding a new subject requires only: drop a data file in the right place + maybe one line in an index
-5. README with the schema is < 1 page and includes a worked example
-6. A second subject is in the repo and works end-to-end (theory, videos, quizzes)
+**Success criteria (met):**
+1. ✓ Daughter can launch a randomized 20-question final exam from the home screen
+2. ✓ Each new exam picks a different random set
+3. ✓ Best exam score preserved across sessions
+4. ✓ "שאלות לחזרה" surfaces every wrong-on-first-try question across all chapters
+5. ✓ Re-answering correctly in review mode updates chapter progress and removes the question from the pool
+6. ✓ Home cards show mastery (correct/answered), not just completion
+7. ✓ No data migration, no regressions in the existing chapter quiz/theory/videos flow
 
-**Suggested approach:**
-- Move `CHAPTERS` array into `data/science-bodies-grade4.json`
-- Add a tiny `subjects/index.json` that lists available subjects
-- Add a landing page or subject picker if there are >1 subjects
-- Refactor `localStorage` keys to be namespaced per subject (so progress doesn't collide)
-
-**UI hint**: yes (subject picker UI may be needed)
+**UI hint**: no (no new UI surfaces beyond the two new home cards and one shared `specialView` container)
 
 ---
 
@@ -113,12 +109,13 @@ Tracked in REQUIREMENTS.md under v2 / Out of Scope:
 
 ---
 
-## Decision: Phases Are Sequenced, Not Parallel
+## Roadmap Status
 
-Even though Phase 1 (deploy) and Phase 2 (refactor) touch different concerns, they run sequentially because:
-1. Phase 1 is time-critical (test on 2026-05-26); Phase 2 is not
-2. Touching the same `index.html` from both at once risks merge friction for a single-parent dev
-3. Phase 1 validates whether the current single-file structure is even worth refactoring — if she barely uses it on mobile, Phase 2 may get descoped
+All three planned phases shipped on 2026-05-17. Next moves are reactive:
+
+- **Until 2026-05-26 (the test):** respond to anything the daughter surfaces while using the app (content errors, confusing questions, missing topics). Edit `index.html` → re-upload to Hostinger.
+- **After the test:** consult `REQUIREMENTS.md` v2 list for next priorities (real anatomy diagrams, audio narration, flashcards, multi-subject reusability — if more tests come up).
 
 ---
 *Roadmap created: 2026-05-17 — manually generated inline (GSD agents not installed)*
+*Last updated: 2026-05-17 after Phase 2 (re-scoped) shipped*

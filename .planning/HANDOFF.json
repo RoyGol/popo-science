@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-17T19:55:22.006Z",
+  "timestamp": "2026-05-17T20:16:44.195Z",
   "source": "auto-postool",
   "partial": false,
   "phase": null,
@@ -21,12 +21,44 @@
       "path": ".planning/HANDOFF.json"
     },
     {
+      "status": "M",
+      "path": ".planning/PROJECT.md"
+    },
+    {
+      "status": "M",
+      "path": ".planning/REQUIREMENTS.md"
+    },
+    {
+      "status": "M",
+      "path": ".planning/ROADMAP.md"
+    },
+    {
+      "status": "M",
+      "path": ".planning/STATE.md"
+    },
+    {
+      "status": "D",
+      "path": ".planning/phases/phase-2/01-extract-content/PLAN.md"
+    },
+    {
+      "status": "D",
+      "path": ".planning/phases/phase-2/02-subject-picker/PLAN.md"
+    },
+    {
+      "status": "D",
+      "path": ".planning/phases/phase-2/03-readme/PLAN.md"
+    },
+    {
+      "status": "M",
+      "path": ".planning/phases/phase-2/PHASE.md"
+    },
+    {
       "status": "??",
       "path": ".claude/"
     },
     {
       "status": "??",
-      "path": ".planning/phases/"
+      "path": ".planning/phases/phase-2/01-study-modes/"
     },
     {
       "status": "??",
@@ -34,5 +66,5 @@
     }
   ],
   "next_action": null,
-  "context_notes": "Recent commits:\n2ac3382 docs: mark Phase 1 (deploy) complete — live on Hostinger\nda79390 docs: initialize GSD project (PROJECT, REQUIREMENTS, ROADMAP, STATE, config, CLAUDE)\nccf7b4e feat: initial study app for grade 4 science test"
+  "context_notes": "Recent commits:\n66a2d0d feat: add final exam + review-wrong-answers modes + correct-count progress\nd5eb3c8 docs: plan phase 2 (reusability refactor) — 3 plans, exec deferred\n2ac3382 docs: mark Phase 1 (deploy) complete — live on Hostinger\nda79390 docs: initialize GSD project (PROJECT, REQUIREMENTS, ROADMAP, STATE, config, CLAUDE)\nccf7b4e feat: initial study app for grade 4 science test"
 }
