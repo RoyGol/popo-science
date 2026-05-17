@@ -79,6 +79,12 @@
 
     <div id="tabContent" class="min-h-[400px]"></div>
   </section>
+
+  <!-- SPECIAL VIEW (Final Exam / Review Mode) -->
+  <section id="specialView" class="hidden bg-white rounded-3xl shadow-xl p-4 md:p-8 fade-in">
+    <button onclick="showHome()" class="mb-4 text-purple-700 font-bold hover:underline">→ חזרה לעמוד הבית</button>
+    <div id="specialContent" class="min-h-[400px]"></div>
+  </section>
 </main>
 
 <footer class="text-center text-sm text-slate-500 pb-8">
@@ -550,33 +556,63 @@ let currentTab = 'theory';
 function renderHome() {
   const progress = loadProgress();
   const grid = document.getElementById('chaptersGrid');
-  grid.innerHTML = CHAPTERS.map(ch => {
-    const chProgress = progress[ch.id] || { answered: [] };
+  const wrongCount = getAllWrongQuestions().length;
+  const bestExamScore = parseInt(localStorage.getItem('popoBestExamScore') || '0', 10);
+
+  // Two special cards at the top of the grid
+  const specialCards = `
+    <button onclick="startFinalExam()" class="chapter-card text-right bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-6 shadow-lg text-white md:col-span-1">
+      <div class="flex items-start justify-between">
+        <div class="text-5xl">📝</div>
+        ${bestExamScore > 0 ? `<div class="text-left text-sm bg-white/30 rounded-full px-3 py-1 font-bold">שיא: ${bestExamScore}/20</div>` : `<div class="text-left text-xs bg-white/30 rounded-full px-3 py-1 font-bold">חדש!</div>`}
+      </div>
+      <h3 class="text-2xl font-black mt-3">מבחן סופי 🎯</h3>
+      <p class="opacity-90 mt-1">20 שאלות מעורבות מכל הפרקים — בדיוק כמו במבחן האמיתי</p>
+      <div class="mt-4 text-sm font-bold">התחל מבחן ←</div>
+    </button>
+    <button onclick="openReviewMode()" class="chapter-card text-right bg-gradient-to-br ${wrongCount > 0 ? 'from-rose-500 to-orange-500' : 'from-emerald-400 to-teal-500'} rounded-3xl p-6 shadow-lg text-white md:col-span-1 ${wrongCount === 0 ? 'opacity-90' : ''}">
+      <div class="flex items-start justify-between">
+        <div class="text-5xl">🔄</div>
+        <div class="text-left text-sm bg-white/30 rounded-full px-3 py-1 font-bold">${wrongCount > 0 ? `${wrongCount} שאלות` : 'כל הכבוד!'}</div>
+      </div>
+      <h3 class="text-2xl font-black mt-3">שאלות לחזרה</h3>
+      <p class="opacity-90 mt-1">${wrongCount > 0 ? 'השאלות שטעית בהן — תרגלי שוב כדי לחזק את מה שלא ידעת' : 'אין שאלות לחזרה — את מעולה! המשיכי לתרגל בפרקים.'}</p>
+      <div class="mt-4 text-sm font-bold">${wrongCount > 0 ? 'התחילי חזרה ←' : '✨'}</div>
+    </button>
+  `;
+
+  // Chapter cards
+  const chapterCards = CHAPTERS.map(ch => {
+    const chProgress = progress[ch.id] || { answered: [], answers: {} };
     const answered = chProgress.answered.length;
+    const correct = countCorrect(ch, chProgress);
     const total = ch.questions.length;
     const pct = Math.round((answered / total) * 100);
+    const correctPct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
     return `
       <button onclick="openChapter('${ch.id}')" class="chapter-card text-right bg-gradient-to-br ${ch.color} rounded-3xl p-6 shadow-lg text-white">
         <div class="flex items-start justify-between">
           <div class="text-5xl">${ch.emoji}</div>
-          <div class="text-left text-sm bg-white/30 rounded-full px-3 py-1 font-bold">${answered}/${total} שאלות</div>
+          <div class="text-left text-sm bg-white/30 rounded-full px-3 py-1 font-bold">${correct}/${answered || total} ${answered > 0 ? 'נכון' : 'שאלות'}</div>
         </div>
         <h3 class="text-2xl font-black mt-3">${ch.title}</h3>
         <p class="opacity-90 mt-1">${ch.subtitle}</p>
         <div class="mt-4 h-2 bg-white/30 rounded-full overflow-hidden">
           <div class="h-full bg-white" style="width:${pct}%"></div>
         </div>
-        <div class="mt-3 text-sm font-bold">${pct === 100 ? '✨ סיימת את כל השאלות!' : 'התחל ללמוד →'}</div>
+        <div class="mt-3 text-sm font-bold">${pct === 100 ? (correctPct === 100 ? '✨ הכל נכון!' : `✓ סיימת — ${correctPct}% נכון`) : (answered > 0 ? `${answered}/${total} • המשיכי →` : 'התחל ללמוד →')}</div>
       </button>
     `;
   }).join('');
 
-  // overall progress
+  grid.innerHTML = specialCards + chapterCards;
+
+  // overall progress (correct answers / total questions)
   const totalQ = CHAPTERS.reduce((s,c) => s + c.questions.length, 0);
-  const totalAnswered = CHAPTERS.reduce((s,c) => s + ((progress[c.id]?.answered || []).length), 0);
-  const overallPct = totalQ ? Math.round((totalAnswered / totalQ) * 100) : 0;
+  const totalCorrect = CHAPTERS.reduce((s,c) => s + countCorrect(c, progress[c.id] || { answers: {} }), 0);
+  const overallPct = totalQ ? Math.round((totalCorrect / totalQ) * 100) : 0;
   document.getElementById('overallProgressBar').style.width = overallPct + '%';
-  document.getElementById('overallProgressText').textContent = overallPct + '%';
+  document.getElementById('overallProgressText').textContent = overallPct + '% נכון';
 }
 
 function openChapter(id) {
@@ -600,6 +636,7 @@ function openChapter(id) {
 function showHome() {
   currentChapterId = null;
   document.getElementById('chapterView').classList.add('hidden');
+  document.getElementById('specialView').classList.add('hidden');
   document.getElementById('chaptersGrid').classList.remove('hidden');
   renderHome();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -777,10 +814,10 @@ function bindQuiz(ch) {
 function updateOverallProgress() {
   const progress = loadProgress();
   const totalQ = CHAPTERS.reduce((s,c) => s + c.questions.length, 0);
-  const totalAnswered = CHAPTERS.reduce((s,c) => s + ((progress[c.id]?.answered || []).length), 0);
-  const pct = totalQ ? Math.round((totalAnswered / totalQ) * 100) : 0;
+  const totalCorrect = CHAPTERS.reduce((s,c) => s + countCorrect(c, progress[c.id] || { answers: {} }), 0);
+  const pct = totalQ ? Math.round((totalCorrect / totalQ) * 100) : 0;
   document.getElementById('overallProgressBar').style.width = pct + '%';
-  document.getElementById('overallProgressText').textContent = pct + '%';
+  document.getElementById('overallProgressText').textContent = pct + '% נכון';
 }
 
 function resetChapterQuiz() {
@@ -792,6 +829,315 @@ function resetChapterQuiz() {
   }
   renderTab();
   updateOverallProgress();
+}
+
+/* =========================
+   FINAL EXAM + REVIEW MODE
+   ========================= */
+
+function getAllWrongQuestions() {
+  const progress = loadProgress();
+  const wrong = [];
+  CHAPTERS.forEach(ch => {
+    const chP = progress[ch.id] || { answers: {} };
+    ch.questions.forEach((q, idx) => {
+      const userChoice = chP.answers?.[idx];
+      if (userChoice !== undefined && userChoice !== q.correct) {
+        wrong.push({
+          ...q,
+          _chapterId: ch.id,
+          _origIdx: idx,
+          _chapterTitle: ch.title,
+          _chapterEmoji: ch.emoji
+        });
+      }
+    });
+  });
+  return wrong;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let currentExam = null;
+
+function startFinalExam(count = 20) {
+  const pool = CHAPTERS.flatMap(ch =>
+    ch.questions.map((q, idx) => ({
+      ...q,
+      _chapterId: ch.id,
+      _origIdx: idx,
+      _chapterTitle: ch.title,
+      _chapterEmoji: ch.emoji
+    }))
+  );
+  const picked = shuffle(pool).slice(0, Math.min(count, pool.length));
+  currentExam = {
+    questions: picked,
+    selections: {}, // idx -> user choice
+    submitted: {},  // idx -> true once submitted
+  };
+  document.getElementById('chaptersGrid').classList.add('hidden');
+  document.getElementById('chapterView').classList.add('hidden');
+  document.getElementById('specialView').classList.remove('hidden');
+  renderFinalExam();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderFinalExam() {
+  const ex = currentExam;
+  const container = document.getElementById('specialContent');
+  const submittedCount = Object.keys(ex.submitted).length;
+  const correctCount = Object.entries(ex.submitted).filter(([idx]) => ex.selections[idx] === ex.questions[idx].correct).length;
+  const allDone = submittedCount === ex.questions.length;
+
+  container.innerHTML = `
+    <div class="flex items-start gap-4 mb-6">
+      <div class="text-5xl">📝</div>
+      <div class="flex-1">
+        <h2 class="text-2xl md:text-3xl font-black text-slate-800">מבחן סופי</h2>
+        <p class="text-slate-600 mt-1">${ex.questions.length} שאלות מעורבות מכל הפרקים</p>
+      </div>
+      <button onclick="startFinalExam()" class="text-sm bg-purple-100 text-purple-700 font-bold py-2 px-4 rounded-full hover:bg-purple-200 transition">🔀 מבחן חדש</button>
+    </div>
+
+    <div class="mb-6 bg-slate-50 rounded-2xl p-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="font-bold text-slate-700">התקדמות במבחן</span>
+        <span class="font-bold text-purple-700">${submittedCount}/${ex.questions.length} שאלות • ${correctCount} נכון</span>
+      </div>
+      <div class="h-3 bg-slate-200 rounded-full overflow-hidden">
+        <div class="progress-bar h-full" style="width:${Math.round(submittedCount / ex.questions.length * 100)}%"></div>
+      </div>
+      ${allDone ? `
+        <div class="mt-4 text-center bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4">
+          <div class="text-3xl mb-2">${correctCount >= 18 ? '🏆' : correctCount >= 15 ? '🎉' : correctCount >= 10 ? '👍' : '💪'}</div>
+          <div class="font-black text-xl text-purple-800">סיימת! ${correctCount}/${ex.questions.length} נכון (${Math.round(correctCount / ex.questions.length * 100)}%)</div>
+          <div class="text-sm text-slate-600 mt-1">${correctCount >= 18 ? 'יוצא מן הכלל! את מוכנה למבחן!' : correctCount >= 15 ? 'יפה מאוד! עוד קצת תרגול וזה יהיה מושלם.' : correctCount >= 10 ? 'התקדמות יפה! המשיכי לתרגל בעיקר את הנושאים שטעית בהם.' : 'נסי שוב! כל פעם תזכרי יותר.'}</div>
+          <button onclick="startFinalExam()" class="mt-3 bg-purple-600 text-white font-bold py-2 px-6 rounded-full hover:bg-purple-700 transition">🔀 מבחן חדש</button>
+        </div>
+      ` : ''}
+    </div>
+
+    <div id="examQuestions" class="space-y-4">
+      ${ex.questions.map((q, idx) => renderExamQuestion(q, idx, ex)).join('')}
+    </div>
+  `;
+  bindExamQuestions();
+}
+
+function renderExamQuestion(q, idx, ex) {
+  const submitted = ex.submitted[idx];
+  const userChoice = ex.selections[idx];
+  const isCorrect = submitted && userChoice === q.correct;
+  return `
+    <div class="bg-white border-2 border-slate-200 rounded-2xl p-4 md:p-5" data-eidx="${idx}">
+      <div class="flex items-start gap-3 mb-2">
+        <div class="flex-shrink-0 w-9 h-9 rounded-full bg-purple-100 text-purple-700 font-black grid place-items-center">${idx + 1}</div>
+        <div class="flex-1">
+          <div class="text-xs text-slate-500 mb-1">${q._chapterEmoji} ${q._chapterTitle}</div>
+          <div class="font-bold text-lg">${q.q}</div>
+        </div>
+      </div>
+      <div class="space-y-2 mb-3 mt-3 options-list">
+        ${q.options.map((opt, oi) => `
+          <button class="quiz-option w-full text-right border-2 border-slate-200 rounded-xl p-3 ${submitted ? 'disabled' : ''} ${submitted && oi === q.correct ? 'correct' : ''} ${submitted && oi === userChoice && oi !== q.correct ? 'wrong' : ''}" data-option="${oi}" ${submitted ? 'disabled' : ''}>
+            <span class="inline-block w-7 h-7 ml-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm grid place-items-center align-middle">${['א','ב','ג','ד'][oi]}</span>
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <button class="hint-btn text-sm bg-yellow-100 text-yellow-800 font-bold py-2 px-4 rounded-full hover:bg-yellow-200 transition">💡 רמז</button>
+        <button class="check-btn text-sm bg-purple-600 text-white font-bold py-2 px-4 rounded-full hover:bg-purple-700 transition ${submitted ? 'hidden' : ''}">בדוק תשובה ✓</button>
+      </div>
+      <div class="hint-text hidden mt-3 bg-yellow-50 border-r-4 border-yellow-400 p-3 rounded text-sm">💡 <b>רמז:</b> ${q.hint}</div>
+      <div class="explanation mt-3 ${submitted ? '' : 'hidden'} ${isCorrect ? 'bg-green-50 border-green-400' : 'bg-rose-50 border-rose-400'} border-r-4 p-3 rounded">
+        <div class="font-bold mb-1">${isCorrect ? '🎉 נכון!' : '❌ לא נכון'}</div>
+        <div class="text-sm">${q.explain}</div>
+      </div>
+    </div>
+  `;
+}
+
+function bindExamQuestions() {
+  const container = document.getElementById('examQuestions');
+  container.querySelectorAll('[data-eidx]').forEach(card => {
+    const idx = +card.dataset.eidx;
+    const ex = currentExam;
+    const q = ex.questions[idx];
+    let selected = ex.selections[idx] ?? null;
+
+    card.querySelectorAll('.quiz-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.classList.contains('disabled')) return;
+        card.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selected = +btn.dataset.option;
+        ex.selections[idx] = selected;
+      });
+    });
+    card.querySelector('.hint-btn').addEventListener('click', () => card.querySelector('.hint-text').classList.toggle('hidden'));
+    card.querySelector('.check-btn').addEventListener('click', () => {
+      if (selected === null) {
+        alert('בחרי תשובה לפני שמלחיצים "בדוק" 🙂');
+        return;
+      }
+      ex.submitted[idx] = true;
+      // Update best score if applicable
+      const allDone = Object.keys(ex.submitted).length === ex.questions.length;
+      if (allDone) {
+        const correctCount = Object.entries(ex.submitted).filter(([i]) => ex.selections[i] === ex.questions[i].correct).length;
+        const prevBest = parseInt(localStorage.getItem('popoBestExamScore') || '0', 10);
+        if (correctCount > prevBest) localStorage.setItem('popoBestExamScore', String(correctCount));
+      }
+      renderFinalExam();
+      // Scroll back to the same card
+      setTimeout(() => {
+        const newCard = document.querySelector(`[data-eidx="${idx}"]`);
+        if (newCard) newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+    });
+  });
+}
+
+/* ----- Review Mode (wrong-answer practice) ----- */
+
+let currentReview = null;
+
+function openReviewMode() {
+  const wrong = getAllWrongQuestions();
+  currentReview = { questions: wrong };
+  document.getElementById('chaptersGrid').classList.add('hidden');
+  document.getElementById('chapterView').classList.add('hidden');
+  document.getElementById('specialView').classList.remove('hidden');
+  renderReviewMode();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderReviewMode() {
+  const rv = currentReview;
+  const container = document.getElementById('specialContent');
+  if (rv.questions.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-12">
+        <div class="text-6xl mb-4">🎉</div>
+        <h2 class="text-2xl font-black text-emerald-700 mb-2">כל הכבוד! אין שאלות לחזרה</h2>
+        <p class="text-slate-600 mb-6">ענית נכון על כל השאלות שניסית. המשיכי לתרגל בפרקים השונים.</p>
+        <button onclick="showHome()" class="bg-purple-600 text-white font-bold py-3 px-8 rounded-full hover:bg-purple-700 transition">חזרה לעמוד הבית</button>
+      </div>
+    `;
+    return;
+  }
+  container.innerHTML = `
+    <div class="flex items-start gap-4 mb-6">
+      <div class="text-5xl">🔄</div>
+      <div class="flex-1">
+        <h2 class="text-2xl md:text-3xl font-black text-slate-800">שאלות לחזרה</h2>
+        <p class="text-slate-600 mt-1">${rv.questions.length} שאלות שטעית בהן — נסי שוב!</p>
+      </div>
+    </div>
+    <div class="mb-4 bg-amber-50 border-r-4 border-amber-400 rounded p-3 text-sm">
+      💡 כשתעני נכון, השאלה תוסר מרשימת החזרה. נסי לענות נכון על כולן!
+    </div>
+    <div id="reviewQuestions" class="space-y-4">
+      ${rv.questions.map((q, idx) => renderReviewQuestion(q, idx)).join('')}
+    </div>
+  `;
+  bindReviewQuestions();
+}
+
+function renderReviewQuestion(q, idx) {
+  return `
+    <div class="bg-white border-2 border-rose-200 rounded-2xl p-4 md:p-5" data-ridx="${idx}">
+      <div class="flex items-start gap-3 mb-2">
+        <div class="flex-shrink-0 w-9 h-9 rounded-full bg-rose-100 text-rose-700 font-black grid place-items-center">${idx + 1}</div>
+        <div class="flex-1">
+          <div class="text-xs text-slate-500 mb-1">${q._chapterEmoji} ${q._chapterTitle}</div>
+          <div class="font-bold text-lg">${q.q}</div>
+        </div>
+      </div>
+      <div class="space-y-2 mb-3 mt-3 options-list">
+        ${q.options.map((opt, oi) => `
+          <button class="quiz-option w-full text-right border-2 border-slate-200 rounded-xl p-3" data-option="${oi}">
+            <span class="inline-block w-7 h-7 ml-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm grid place-items-center align-middle">${['א','ב','ג','ד'][oi]}</span>
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <button class="hint-btn text-sm bg-yellow-100 text-yellow-800 font-bold py-2 px-4 rounded-full hover:bg-yellow-200 transition">💡 רמז</button>
+        <button class="check-btn text-sm bg-purple-600 text-white font-bold py-2 px-4 rounded-full hover:bg-purple-700 transition">בדוק תשובה ✓</button>
+      </div>
+      <div class="hint-text hidden mt-3 bg-yellow-50 border-r-4 border-yellow-400 p-3 rounded text-sm">💡 <b>רמז:</b> ${q.hint}</div>
+      <div class="explanation hidden mt-3 border-r-4 p-3 rounded">
+        <div class="font-bold mb-1"></div>
+        <div class="text-sm">${q.explain}</div>
+      </div>
+    </div>
+  `;
+}
+
+function bindReviewQuestions() {
+  const container = document.getElementById('reviewQuestions');
+  container.querySelectorAll('[data-ridx]').forEach(card => {
+    const idx = +card.dataset.ridx;
+    const q = currentReview.questions[idx];
+    let selected = null;
+
+    card.querySelectorAll('.quiz-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.classList.contains('disabled')) return;
+        card.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selected = +btn.dataset.option;
+      });
+    });
+    card.querySelector('.hint-btn').addEventListener('click', () => card.querySelector('.hint-text').classList.toggle('hidden'));
+    card.querySelector('.check-btn').addEventListener('click', () => {
+      if (selected === null) { alert('בחרי תשובה לפני שמלחיצים "בדוק" 🙂'); return; }
+      const isCorrect = selected === q.correct;
+      card.querySelectorAll('.quiz-option').forEach((b, oi) => {
+        b.classList.add('disabled');
+        b.disabled = true;
+        if (oi === q.correct) b.classList.add('correct');
+        if (oi === selected && !isCorrect) b.classList.add('wrong');
+      });
+      card.querySelector('.check-btn').classList.add('hidden');
+      const exp = card.querySelector('.explanation');
+      exp.classList.remove('hidden');
+      exp.classList.add(isCorrect ? 'bg-green-50' : 'bg-rose-50', isCorrect ? 'border-green-400' : 'border-rose-400');
+      exp.querySelector('.font-bold').textContent = isCorrect ? '🎉 כל הכבוד! עכשיו זה נכון' : '❌ עדיין לא — נסי לקרוא שוב את ההסבר';
+      if (isCorrect) card.classList.add('celebrate');
+
+      // Persist the new answer to the original chapter's progress
+      const p = loadProgress();
+      p[q._chapterId] = p[q._chapterId] || { answered: [], answers: {} };
+      if (!p[q._chapterId].answered.includes(q._origIdx)) p[q._chapterId].answered.push(q._origIdx);
+      p[q._chapterId].answers = p[q._chapterId].answers || {};
+      p[q._chapterId].answers[q._origIdx] = selected;
+      saveProgress(p);
+      updateOverallProgress();
+
+      // If correct: fade card and show "moved out" indicator
+      if (isCorrect) {
+        setTimeout(() => {
+          card.style.transition = 'opacity .6s ease';
+          card.style.opacity = '0.5';
+          const moved = document.createElement('div');
+          moved.className = 'mt-2 text-center text-sm text-emerald-700 font-bold';
+          moved.textContent = '✨ הוסרה מרשימת החזרה';
+          card.appendChild(moved);
+        }, 800);
+      }
+    });
+  });
 }
 
 /* INIT */
