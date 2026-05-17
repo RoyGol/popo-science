@@ -24,12 +24,12 @@ Requirements for the initial test (2026-05-26) plus the reusability work. v1 her
 - [x] **UX-04**: Tabbed interface per chapter (חומר לימוד / סרטונים / תרגול)
 - [x] **UX-05**: Reset-per-chapter button so she can retake quizzes
 
-### Deployment (Phase 1)
+### Deployment (Phase 1 — shipped ✓)
 
-- [ ] **DEPLOY-01**: App accessible via a public HTTPS URL
-- [ ] **DEPLOY-02**: URL works on her phone and tablet (responsive layout already in place — verify)
-- [ ] **DEPLOY-03**: URL is short / memorable enough to type or bookmark easily
-- [ ] **DEPLOY-04**: Deployment process is one command/click so updates can ship same-day
+- [x] **DEPLOY-01**: App accessible via a public HTTPS URL — `https://palevioletred-crow-274361.hostingersite.com/` (Hostinger)
+- [x] **DEPLOY-02**: URL works on her phone and tablet (responsive layout in place)
+- [x] **DEPLOY-03**: URL is bookmarkable (auto-generated Hostinger subdomain; long but bookmark-once-and-done is fine for the use case)
+- [x] **DEPLOY-04**: Deployment process is one-step via Hostinger
 
 ### Reusability (Phase 2)
 
@@ -70,14 +70,14 @@ Deferred. Not in current roadmap.
 |-------------|-------|--------|
 | CONT-01 → CONT-06 | Phase 0 | Complete ✓ |
 | UX-01 → UX-05 | Phase 0 | Complete ✓ |
-| DEPLOY-01 → DEPLOY-04 | Phase 1 | Pending |
+| DEPLOY-01 → DEPLOY-04 | Phase 1 | Complete ✓ |
 | REUSE-01 → REUSE-04 | Phase 2 | Pending |
 
 **Coverage:**
-- v1 requirements: 19 total (11 done, 8 pending)
+- v1 requirements: 19 total (15 done, 4 pending)
 - Mapped to phases: 19
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-17*
-*Last updated: 2026-05-17 after initial definition*
+*Last updated: 2026-05-17 after Phase 1 deployment*

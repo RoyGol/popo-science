@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-17T18:59:45.696Z",
+  "timestamp": "2026-05-17T19:09:15.432Z",
   "source": "auto-postool",
   "partial": false,
   "phase": null,
@@ -17,12 +17,28 @@
   "decisions": [],
   "uncommitted_files": [
     {
-      "status": "??",
-      "path": ".planning/"
+      "status": "M",
+      "path": ".planning/HANDOFF.json"
+    },
+    {
+      "status": "M",
+      "path": ".planning/PROJECT.md"
+    },
+    {
+      "status": "M",
+      "path": ".planning/REQUIREMENTS.md"
+    },
+    {
+      "status": "M",
+      "path": ".planning/ROADMAP.md"
+    },
+    {
+      "status": "M",
+      "path": ".planning/STATE.md"
     },
     {
       "status": "??",
-      "path": "CLAUDE.md"
+      "path": ".claude/"
     },
     {
       "status": "??",
@@ -30,5 +46,5 @@
     }
   ],
   "next_action": null,
-  "context_notes": "Recent commits:\nccf7b4e feat: initial study app for grade 4 science test"
+  "context_notes": "Recent commits:\nda79390 docs: initialize GSD project (PROJECT, REQUIREMENTS, ROADMAP, STATE, config, CLAUDE)\nccf7b4e feat: initial study app for grade 4 science test"
 }

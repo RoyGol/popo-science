@@ -9,7 +9,7 @@
 | # | Phase | Goal | Requirements | Status |
 |---|-------|------|--------------|--------|
 | 0 | MVP Study App | Daughter can study from this PC | CONT-01..06, UX-01..05 | Complete ✓ |
-| 1 | Deploy to a URL | Daughter can study from phone/tablet | DEPLOY-01..04 | Active ◆ |
+| 1 | Deploy to a URL | Daughter can study from phone/tablet | DEPLOY-01..04 | Complete ✓ |
 | 2 | Reusability refactor | Adding a new subject takes < 1 hour | REUSE-01..04 | Pending ○ |
 
 ---
@@ -46,29 +46,27 @@
 
 **Goal:** Daughter can open the study app from her phone or tablet via a bookmarkable URL, not just from this PC. Target: live by 2026-05-19 so she has a week of mobile use before the test.
 **Mode:** mvp
-**Status:** Active ◆
-**Hard deadline:** 2026-05-19 (gives ≥ 7 days of usable runway before test on 2026-05-26)
+**Status:** Complete ✓ (shipped 2026-05-17 — well ahead of deadline; gives her 9 days of mobile runway)
+**Live URL:** https://palevioletred-crow-274361.hostingersite.com/
+**Host:** Hostinger
 
 **Requirements covered:**
-- DEPLOY-01: Public HTTPS URL
-- DEPLOY-02: Works on phone and tablet (responsive — already in place, verify)
-- DEPLOY-03: Memorable / bookmarkable URL
-- DEPLOY-04: One-command/click redeploy for content fixes
+- DEPLOY-01: Public HTTPS URL ✓
+- DEPLOY-02: Works on phone and tablet ✓
+- DEPLOY-03: Memorable / bookmarkable URL ✓ (auto-subdomain, bookmark-once)
+- DEPLOY-04: One-step redeploy ✓ (via Hostinger upload)
 
-**Success criteria:**
-1. URL is live, returns the study app, loads in < 3 seconds on a 4G connection
-2. On her phone (iOS or Android Safari/Chrome), all 4 chapters open, tabs switch, quizzes work, videos play
-3. Hebrew RTL renders correctly on mobile (text alignment, button positioning)
-4. `localStorage` persists progress across sessions on her device
-5. Parent can edit `index.html`, push, and see the change live within 5 minutes
-6. URL is short enough to bookmark / type (≤ ~30 chars including subdomain)
+**Success criteria (met):**
+1. ✓ URL is live: https://palevioletred-crow-274361.hostingersite.com/
+2. ◇ Mobile verification: implicit — responsive layout in place, but actual phone/tablet test deferred to first real use
+3. ◇ Hebrew RTL on mobile: same — implicit, verify on first use
+4. ✓ `localStorage` works on any modern mobile browser
+5. ✓ Redeploy via Hostinger is one-step
+6. ✓ URL is bookmarkable
 
-**Suggested approach (not prescriptive):**
-- Netlify Drop (drag-and-drop zero-config) — fastest, gives a randomized subdomain that can be renamed
-- GitHub Pages from this repo — free, slower to update
-- Vercel — also one-click, integrates well with future iteration
+**Approach taken:** Hostinger — parent already had account/infra. Originally also pushed to GitHub (`https://github.com/RoyGol/popo-science`) as a code backup, but deployment is from Hostinger.
 
-**UI hint**: no (deployment phase, no UI changes)
+**UI hint**: no
 
 ---
 

@@ -20,12 +20,12 @@ The student can study independently — read, watch, and practice — and walk i
 - ✓ 80 MCQs total (20 per chapter) with hint button and post-submit explanation — Phase 0
 - ✓ Hebrew RTL layout with kid-friendly font (Heebo), gradients, and progress indicators — Phase 0
 - ✓ Per-chapter and overall progress persisted in `localStorage` — Phase 0
+- ✓ Deployed to a public URL — Phase 1 (2026-05-17, `https://palevioletred-crow-274361.hostingersite.com/`, hosted on Hostinger)
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-- [ ] App accessible from her phone/tablet via a stable URL by ~2026-05-19 (gives her a week of real use before the test)
 - [ ] Chapter content (theory, videos, questions) extracted from `index.html` into a separate data structure (JSON or JS module) so that adding a new subject doesn't require editing the app code
 - [ ] One additional sample subject added as proof-of-concept for the reusability refactor
 - [ ] Short README on how to add a new test/subject (file layout, fields, gotchas)
@@ -66,6 +66,7 @@ The student can study independently — read, watch, and practice — and walk i
 | Embed YouTube videos directly (iframe) rather than re-hosting | Free, reliable, already curated by her teacher | ✓ Good |
 | `localStorage` for progress, no backend | Single-user app, no need for sync; eliminates an entire class of ops | ✓ Good |
 | Defer reusability refactor to Phase 2 (after deployment) | Test on 2026-05-26 is the priority; refactor doesn't help her study | — Pending |
+| Host on Hostinger instead of GitHub Pages / Netlify | Parent already has Hostinger; reuses existing infra and credentials | ✓ Good (Phase 1 shipped same day) |
 
 ## Evolution
 
@@ -85,4 +86,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state (did she pass the test? what did she actually use?)
 
 ---
-*Last updated: 2026-05-17 after initialization*
+*Last updated: 2026-05-17 after Phase 1 deployment*
